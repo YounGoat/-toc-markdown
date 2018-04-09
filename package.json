@@ -1,0 +1,28 @@
+{
+    "bin": {
+        "toc-md": "bin/toc-md.js"
+    },
+    "dependencies": {},
+    "directories": {},
+    "scripts": {
+        "test": "mocha"
+    },
+    "name": "@toc/markdown",
+    "version": "0.0.1",
+    "main": "index.js",
+    "keywords": [
+        "ToC",
+        "markdown"
+    ],
+    "homepage": "https://github.com/YounGoat/-toc-markdown",
+    "description": "ToC generator for markdown.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/YounGoat/-toc-markdown.git"
+    },
+    "author": {
+        "name": "YounGoat",
+        "email": "youngoat@163.com",
+        "url": "https://youngoat.github.io"
+    }
+}
