@@ -25,6 +25,10 @@ Analyse markdown text and generate *Table of Contents*.
 
 *   CLI mode
     ```bash
+    # Install globally.
+    # Command `toc-md` will be created.
+    npm install -g @toc/markdown
+
     # Read markdown file and write markdown text with "Table of Contents" 
     # section into another file.
     toc-md /path/of/input.md /path/of/output.md
