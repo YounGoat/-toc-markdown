@@ -7,11 +7,11 @@ __ToC generator for markdown.__
 
 Analyse markdown text and generate *Table of Contents*.
 
-##	ToC
+##	Table of Contents
 
-*	[Get Started](#get-started)
-*	[API](#api)
-*   [Links](#links)
+* [Get Started](#get-started)
+* [API](#api)
+* [Links](#links)
 
 ##	Get Started
 
@@ -41,6 +41,23 @@ Analyse markdown text and generate *Table of Contents*.
 *options* may contain following properties:
 *   __options.indent__ *number* | *string* DEFAULT "\u0009"  
     Indent used on creating sub list in the ToC catalog. The default value is a TABSTOP character.
+
+*   __options.ignore__ *string* | *string[]* DEFAULT "\< position"  
+    Indicate what titles should be ignored.  
+    The possible values may be:
+    ```javascript
+    // Titles of sections preceding ToC section will be ingored.
+    { ignore: '< position' }
+
+    // Titles of sections following ToC section will be ingored.
+    { ignore: '> position' }
+
+    // Title of section No.3 will be ignored.
+    { ignore: 3 }
+
+    // Title of section No.1, No.2, No.9 and the following will be ignored.
+    { ignore: [ 1, 2, '> 9' ] }
+    ```
 
 *   __options.position__ *number* DEFAULT 1  
     Indicate where to put the generated ToC section.  

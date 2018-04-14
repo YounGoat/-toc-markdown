@@ -40,6 +40,7 @@ function addToC(inputPath, outputPath, options) {
 }
 
 let cmd = commandos.parse({
+	explicit: true,
 	groups: [
 		[ 
 			'--help -h [*:=* help] REQUIRED', 
@@ -47,13 +48,13 @@ let cmd = commandos.parse({
 			'--file -f NOT NULL REQUIRED',
 			'--overwrite NOT ASSIGNABLE',
 			'--title -t',
-			'--position NOT NULL',
+			'--position --pos NOT NULL',
 		], [
 			'--input -i [0] NOT NULL REQUIRED',
 			'--output -o [1] NOT NULL',
 			'--overwrite NOT ASSIGNABLE',
 			'--title -t',
-			'--position NOT NULL',
+			'--position --pos NOT NULL',
 		],
 	],
 	catcher: help

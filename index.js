@@ -12,11 +12,13 @@ const MODULE_REQUIRE = 1
     ;
 
 /**
- * @param  {string}   md - markdown text
- * @param  {Object}  [options]
- * @param  {number}  [options.position]  - put ToC before the n-th second-level title
- * @param  {boolean} [options.overwrite] - whether to overwrite exsiting ToC section
- * @param  {number}  [options.title]     - title of ToC section
+ * @param  {string}    md - markdown text
+ * @param  {Object}   [options]
+ * @param  {string}   [options.ignore]
+ * @param  {Array}    [options.ignore]
+ * @param  {number}   [options.position]  - put ToC before the n-th second-level title
+ * @param  {boolean}  [options.overwrite] - whether to overwrite exsiting ToC section
+ * @param  {number}   [options.title]     - title of ToC section
  */
 function toc(md, options) {
     let opt = Object.assign({
@@ -27,6 +29,8 @@ function toc(md, options) {
          * .  2 - Put Toc just before 2nd second-level title line.
          */
         position: 1,
+
+        ignore: '< position',
 
         indent: '\u0009',
 
@@ -40,6 +44,10 @@ function toc(md, options) {
          */
         overwrite: true,
     }, options);
+
+    if (!(opt.ignore instanceof Array)) {
+        opt.ignore = [ opt.ignore ];
+    }
 
     let NEWLINES = [ '\r\n', '\n', '\r' ];
     let newline = NEWLINES.find(n => md.indexOf(n) >= 0);
@@ -65,7 +73,6 @@ function toc(md, options) {
     // To indicate if text line is in a code block.
     let inCodeBlock = false;
 
-    let ignore = false;
     let exsitingTocBegin = null;
     let exsitingTocEnd = null;
 
@@ -97,22 +104,63 @@ function toc(md, options) {
             
             if (level == secondLevel) {
                 secondLevelIndent = indent;
+                secondLevelTitles++;
 
                 if (opt.title == text && exsitingTocBegin == null) {
                     exsitingTocBegin = index;
-                    ignore = opt.overwrite;
                 }
                 else if (exsitingTocBegin != null && exsitingTocEnd == null) {
                     exsitingTocEnd = index - 1;
-                    ignore = false;
                 }
 
-                if (opt.position > 0 && ++secondLevelTitles == opt.position) {
+                if (opt.position > 0 && secondLevelTitles == opt.position) {
                     tocLineno = index;
                 }
             }
+
+            let ignoreCurrent = false;
+            if (exsitingTocBegin !== null && exsitingTocEnd == null) {
+                ignoreCurrent = true;
+            }
+
+            if (!ignoreCurrent) {
+                opt.ignore.every(ignore => {
+                    if (ignore == text) {
+                        ignoreCurrent = true;
+                    }
+                    else if (ignore == secondLevelTitles) {
+                        ignoreCurrent = true;                        
+                    }
+                    else if (/^(>|>=|<|<=|=)\s*(position|\d+)?$/i.test(ignore)) {
+                        let op = RegExp.$1;
+                        let position = 'position' == RegExp.$2 ? opt.position : parseInt(RegExp.$2);
+                        switch (op) {
+                            case '>':
+                                ignoreCurrent = secondLevelTitles > position;
+                                break;
+
+                            case '>=':
+                                ignoreCurrent = secondLevelTitles >= position;
+                                break;
+
+                            case '<':
+                                ignoreCurrent = secondLevelTitles < position;
+                                break;
+                        
+                            case '<=':
+                                ignoreCurrent = secondLevelTitles <= position;
+                                break;
+                            
+                            case '=':
+                                ignoreCurrent = secondLevelTitles == position;
+                                break;
+                        }
+                    }
+                    return !ignoreCurrent;
+                });
+            }
             
-            if (!ignore) {
+            if (!ignoreCurrent) {
                 titles.push({ text, level });
             }
         }
@@ -122,7 +170,6 @@ function toc(md, options) {
             return;
         }
     });
-
 
     let tocLines = [];
     
@@ -143,7 +190,7 @@ function toc(md, options) {
     if (exsitingTocBegin != null && opt.overwrite) {
         if (exsitingTocEnd == null) exsitingTocEnd = lines.length;
         lines = lines.slice(0, exsitingTocBegin).concat(lines.slice(exsitingTocEnd));
-        tocLineno = exsitingTocBegin;        
+        tocLineno = exsitingTocBegin;
     }
 
     // Insert an empty line respectively at the begining and end if necessary.
@@ -152,7 +199,7 @@ function toc(md, options) {
     }
     if (lines[tocLineno].trim() != '') {
         tocLines.push('');
-    }    
+    }
 
     lines = [].concat(lines.slice(0, tocLineno), tocLines, lines.slice(tocLineno));
 

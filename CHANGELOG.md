@@ -2,6 +2,10 @@
 
 Notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning 2.0.0](http://semver.org/).
 
+##  [0.0.3] - Apr 14th, 2018
+
+*   __options.ignore__ is acceptable.
+
 ##  [0.0.2] - Apr 10th, 2018
 
 *   Dependencies completed.
