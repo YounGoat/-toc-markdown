@@ -8,7 +8,18 @@ const MODULE_REQUIRE = 1
     /* in-package */
 
     /* in-file */
-    , text2aname = text => text.replace(/\s+/g, '-').toLowerCase().replace(/[^a-z0-9\-]/g, '')
+
+    /**
+     * Create anchor name with original title text. 
+     */ 
+    , text2aname = text => {
+        let aname = text
+            .toLowerCase()
+            .replace(/[^a-z0-9\s\-]/g, '')
+            .replace(/\s+/g, '-')
+            ;
+        return aname;
+    }
     ;
 
 /**

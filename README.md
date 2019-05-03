@@ -13,7 +13,7 @@ Analyse markdown text and generate *Table of Contents*.
 * [API](#api)
 * [Links](#links)
 
-##	Get Started
+##	Get & Started
 
 *   API mode
     ```javascript
