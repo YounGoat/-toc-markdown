@@ -15,7 +15,7 @@ const MODULE_REQUIRE = 1
     , text2aname = text => {
         let aname = text
             .toLowerCase()
-            .replace(/[^a-z0-9\s\-]/g, '')
+            .replace(/[^\p{Script=Han}\w\s\-]/gu, '')
             .replace(/\s+/g, '-')
             ;
         return aname;
@@ -28,6 +28,7 @@ const MODULE_REQUIRE = 1
  * @param  {string}   [options.ignore]
  * @param  {Array}    [options.ignore]
  * @param  {number}   [options.position]  - put ToC before the n-th second-level title
+ * @param  {boolean}  [options.sort]
  * @param  {boolean}  [options.overwrite] - whether to overwrite exsiting ToC section
  * @param  {number}   [options.title]     - title of ToC section
  */
@@ -48,7 +49,7 @@ function toc(md, options) {
         /**
          * Set falsy to disable the title of ToC section.
          */
-        title: 'Table of Contents',
+        title: 'ToC',
 
         /**
          * Whether to overwrite existing ToC section.
@@ -88,6 +89,18 @@ function toc(md, options) {
     let exsitingTocEnd = null;
 
     lines.forEach((line, index) => {
+        /**
+         * Single line code
+         * 单行代码
+         */
+        if (line.startsWith('```.') && line.endsWith('.```')) {
+            return;
+        }
+
+        /**
+         * Code block starts or ends here.
+         * 代码块（多行代码）由此处开始或结束。
+         */
         if (line.startsWith('```')) {
             inCodeBlock = !inCodeBlock;
             return;
@@ -99,7 +112,7 @@ function toc(md, options) {
         }
 
         if (re.test(line)) {
-            let text = RegExp.$3;
+            let text = RegExp.$3.trim();
             let level = RegExp.$1.length;
             let indent = RegExp.$2;
             
@@ -187,6 +200,28 @@ function toc(md, options) {
     if (opt.title) {
         tocLines.push(`${'#'.repeat(secondLevel)}${secondLevelIndent}${opt.title}`);
         tocLines.push('');
+    }
+
+    SORT: {
+        let levelText = [], level = 0;
+        titles.forEach(title => {
+            levelText = levelText.slice(0, title.level);
+            levelText[title.level] = title.text;
+            title.sortBy = levelText;
+        });
+        titles = titles.sort((a, b) => {
+            a = a.sortBy;
+            b = b.sortBy;
+            
+            for (let i = 0; i < Math.min(a.length, b.length); i++) {
+                if (a[i] == b[i]) continue ;
+                if (a[i]  < b[i]) return -1;
+                if (a[i]  > b[i]) return  1;
+            }
+            if (a.length == b.length) return  0;
+            if (a.length  < b.length) return -1;
+            if (a.length  > b.length) return  1;
+        });
     }
 
     let indent = typeof opt.indent == 'number' ? '\u0020'.repeat(opt.indent) : opt.indent;

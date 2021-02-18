@@ -47,12 +47,14 @@ let cmd = commandos.parse({
 		], [
 			'--file -f NOT NULL REQUIRED',
 			'--overwrite NOT ASSIGNABLE',
+			'--sort',
 			'--title -t',
 			'--position --pos NOT NULL',
 		], [
 			'--input -i [0] NOT NULL REQUIRED',
 			'--output -o [1] NOT NULL',
 			'--overwrite NOT ASSIGNABLE',
+			'--sort',
 			'--title -t',
 			'--position --pos NOT NULL',
 		],
